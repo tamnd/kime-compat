@@ -1,0 +1,6 @@
+{
+  "state": {"subject": "hello", "body": "just checking in"},
+  "questions": {
+    "only": {"type": "choice", "criteria": ["other"]}
+  }
+}

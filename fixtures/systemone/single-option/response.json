@@ -1,0 +1,7 @@
+{
+  "model": "kime-v1-s-en-0.1.0",
+  "answers": {
+    "only": {"type": "choice", "choice": "other", "confidence": 1.0, "probabilities": {"other": 1.0}}
+  },
+  "usage": {"input_tokens": 21, "output_tokens": 0}
+}

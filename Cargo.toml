@@ -1,0 +1,29 @@
+# Not published. This is a harness that runs other people's clients against kime, and nobody
+# should depend on it from a build.
+[package]
+name = "kime-compat"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.90.0"
+license = "Apache-2.0"
+repository = "https://github.com/tamnd/kime-compat"
+description = "The compatibility harness for kime."
+publish = false
+
+[dependencies]
+# preserve_order because answer order is part of the contract: spec/03-api.md says answers come
+# back in request order, and a map that sorts its keys would hide a server that does not.
+serde_json = { version = "1", features = ["preserve_order"] }
+
+[lints.rust]
+missing_debug_implementations = "warn"
+rust_2018_idioms = "warn"
+unreachable_pub = "warn"
+unused_qualifications = "warn"
+
+[lints.clippy]
+undocumented_unsafe_blocks = "warn"
+doc_markdown = "allow"
+missing_panics_doc = "warn"
+todo = "warn"
+float_cmp = "warn"

@@ -1,0 +1,9 @@
+{
+  "state": "I was charged twice this month and nobody has answered my last two emails.",
+  "model": "kime-v1-m-en",
+  "questions": {
+    "team": {"type": "choice", "instructions": "Which team should handle this", "criteria": {"billing": "Payment issues", "technical": "Bugs", "sales": "Plans"}},
+    "mood": {"type": "score", "instructions": "How upset is the customer", "criteria": ["Calm", "Frustrated", "Very angry"]},
+    "refund": {"type": "noul", "instructions": "The customer asks for a refund"}
+  }
+}

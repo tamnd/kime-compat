@@ -1,0 +1,9 @@
+{
+  "model": "kime-v1-m-en-1.0.0",
+  "answers": {
+    "team": {"type": "choice", "choice": "billing", "confidence": 0.81, "probabilities": {"billing": 0.88, "technical": 0.12, "sales": 0.0}},
+    "mood": {"type": "score", "score": 1.05, "confidence": 0.92, "legend": {"0": "Calm", "1": "Frustrated", "2": "Very angry"}, "probabilities": {"0": 0.0, "1": 0.95, "2": 0.05}},
+    "refund": {"type": "noul", "noul": 0.95}
+  },
+  "usage": {"input_tokens": 318, "output_tokens": 0}
+}

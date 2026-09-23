@@ -1,0 +1,12 @@
+# The compatibility surfaces from spec/15-testing.md in the kime repository. Each row is something a
+# Jev or Laya user already runs, what has to pass for kime to count as a drop in replacement, and
+# the milestone in tamnd/kime where it starts running here.
+id	surface	what passes	milestone
+openapi	TypeSafe OpenAPI	Every kime response validates against the committed /openapi.json snapshot, and Schemathesis generated requests are all accepted	M1
+sdk-python	TypeSafe Python SDK	The SDK's recorded fixtures replay against kime-serve and its typed parsing succeeds on every response	M1
+sdk-js	TypeSafe JS SDK	The examples run against kime-serve under Node 20 and Bun	M1
+jev-ultrafast	jev-ultrafast	validate_choice passes on 10,000 generated agent steps, and the Wikipedia example runs end to end with jev-latest unchanged	M1
+laya	Laya Python API	Laya's own test suite passes against the kime package, except the documented bugs listed in laya_expected_diffs.md	M1
+laya-serve	laya-serve clients	The impossibl and laya-serve curl examples give the same response shape, and the same answers within parity tolerance on compat models	M1
+errors	Error bodies	A snapshot for every error status body in spec/03-api.md	M1
+wire	The response contract	Every committed fixture obeys the rules clients depend on: answer order, probability keys, sums, argmax, legend	M0
