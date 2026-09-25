@@ -8,7 +8,7 @@ It is a separate repository for the same reason the benchmarks are: someone who 
 
 ## Where kime is, today
 
-Three things run. The response contract (the rules from `spec/03-api.md` that clients actually break on) is checked on the committed fixtures, and on what a running kime-serve answers to the same requests: answer order matches question order, probability keys are exactly the offered labels, rounded probabilities sum to exactly one, `choice` is an argmax, `score` is the expected level, `legend` echoes the criteria, `model` is never an alias, nothing is ever generated, and `/v1/models` has the shape the TypeSafe SDKs parse. The TypeSafe JS SDK examples in `sdk-js/` run against kime-serve with `@typesafe-ai/sdk` 0.6.0 unmodified, under Node 20 and Bun.
+Four things run. The response contract (the rules from `spec/03-api.md` that clients actually break on) is checked on the committed fixtures, and on what a running kime-serve answers to the same requests: answer order matches question order, probability keys are exactly the offered labels, rounded probabilities sum to exactly one, `choice` is an argmax, `score` is the expected level, `legend` echoes the criteria, `model` is never an alias, nothing is ever generated, and `/v1/models` has the shape the TypeSafe SDKs parse. The TypeSafe JS SDK examples in `sdk-js/` run against kime-serve with `@typesafe-ai/sdk` 0.6.0 unmodified, under Node 20 and Bun. `sdk-python/run.py` sends the committed requests through `typesafe-sdk` 0.7.1, with its sync and async clients, and checks that its typed parsing takes every answer, that `/v1/models` parses, and that an unknown model raises `TypeSafeNotFoundError`. Laya's own tests run against the kime package, see below.
 
 CI builds kime-serve from tamnd/kime main on the laya checkpoint and runs both through `ci/against-kime.sh`, and the kime repository runs the same script on its own changes.
 
@@ -17,7 +17,7 @@ CI builds kime-serve from tamnd/kime main on the laya checkpoint and runs both t
 | Surface | What passes | Starts |
 |---|---|---|
 | TypeSafe OpenAPI | Every response validates against the committed `/openapi.json` snapshot, and Schemathesis generated requests are all accepted | M1 |
-| TypeSafe Python SDK | The SDK's recorded fixtures replay against kime-serve and its typed parsing succeeds | M1 |
+| TypeSafe Python SDK | The committed requests replay through typesafe-sdk 0.7.1 against kime-serve, sync and async, and its typed parsing succeeds | M1 |
 | TypeSafe JS SDK | The examples run against kime-serve under Node 20 and Bun | M1 |
 | jev-ultrafast | `validate_choice` passes on 10,000 generated agent steps, and the Wikipedia example runs end to end with `jev-latest` unchanged | M1 |
 | Laya Python API | Laya's own test suite passes against the kime package, except the files listed in `laya-suite/expected.tsv` | M1 |

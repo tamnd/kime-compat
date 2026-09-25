@@ -5,8 +5,9 @@
 #
 #   ci/against-kime.sh <kime binary> <models dir> [runtime ...]
 #
-# A runtime is a command that runs sdk-js/run.mjs, such as node or bun. The server log is printed
-# if anything fails.
+# A runtime is a command that runs sdk-js/run.mjs, such as node or bun. With KIME_COMPAT_SDK_PYTHON
+# set to a python that has typesafe-sdk 0.7.1, the committed requests also go through the TypeSafe
+# Python SDK. The server log is printed if anything fails.
 set -euo pipefail
 
 bin="$1"
@@ -40,3 +41,7 @@ curl --silent --fail "$url/v1/models" > /dev/null || fail "kime serve did not li
 for runtime in "$@"; do
   (cd "$here/sdk-js" && KIME_COMPAT_URL="$url" "$runtime" run.mjs) || fail "the JS SDK examples failed on $runtime"
 done
+
+if [ -n "${KIME_COMPAT_SDK_PYTHON:-}" ]; then
+  "$KIME_COMPAT_SDK_PYTHON" "$here/sdk-python/run.py" "$url" || fail "the Python SDK replay failed"
+fi
