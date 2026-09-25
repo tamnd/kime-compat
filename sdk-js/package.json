@@ -1,0 +1,13 @@
+{
+  "name": "kime-compat-sdk-js",
+  "private": true,
+  "type": "module",
+  "description": "The TypeSafe JS SDK, unmodified, run against kime-serve",
+  "license": "Apache-2.0",
+  "scripts": {
+    "compat": "node run.mjs"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "0.6.0"
+  }
+}

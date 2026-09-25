@@ -1,9 +1,9 @@
 # The per commit gate. Everything here is required to merge.
 #
-# At M0 this checks that the harness builds, that its own tests pass, and that every committed
-# fixture obeys the response contract from spec/03-api.md in the kime repository. From M1 a job here
-# builds kime-serve from tamnd/kime main and replays the surfaces against it, and the kime
-# repository runs the same suite against its own tree before a change merges.
+# This checks that the harness builds, that its own tests pass, and that every committed fixture
+# obeys the response contract from spec/03-api.md in the kime repository. The kime job builds
+# kime-serve from tamnd/kime main and runs the live surfaces against it, and the kime repository
+# runs the same script against its own tree before a change merges.
 #
 # Actions are pinned to a full commit hash with the version in a comment.
 
@@ -76,6 +76,53 @@ jobs:
       - name: cargo doc
         run: cargo doc --no-deps --all-features
 
+  # The live surfaces, against kime-serve built from tamnd/kime main on the laya checkpoint. The
+  # checkpoint is 843 MB, so it is cached by its pinned revision, as in the kime repository.
+  kime:
+    name: against kime main
+    needs: quick
+    runs-on: ubuntu-24.04
+    env:
+      LAYA_REVISION: 5e7b2b1b8ca2ecdd3f2322d94069c9b6ce7e844b
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: tamnd/kime
+          path: kime
+          persist-credentials: false
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: kime
+          workspaces: |
+            .
+            kime
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: models/laya
+          key: laya-${{ env.LAYA_REVISION }}
+      - name: fetch the checkpoint
+        run: |
+          set -euo pipefail
+          for f in rl_agent_config.json encoder/config.json tokenizer/tokenizer.json tokenizer/tokenizer_config.json model.safetensors; do
+            if [ -s "models/laya/$f" ]; then continue; fi
+            mkdir -p "models/laya/$(dirname "$f")"
+            curl --fail --silent --show-error --location --retry 3 -o "models/laya/$f" "https://huggingface.co/convaiinnovations/laya/resolve/$LAYA_REVISION/$f"
+          done
+      - name: build kime
+        working-directory: kime
+        run: cargo build --release -p kime-cli
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "20"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      # Node 20 is the oldest the TypeSafe JS SDK supports, and Bun is the other runtime its
+      # examples are promised on.
+      - name: the live surfaces
+        run: ci/against-kime.sh kime/target/release/kime "$GITHUB_WORKSPACE/models" node bun
+
   workflows:
     name: workflow audit
     runs-on: ubuntu-24.04
@@ -90,7 +137,7 @@ jobs:
   ci:
     name: ci
     if: always()
-    needs: [quick, test, docs, workflows]
+    needs: [quick, test, docs, kime, workflows]
     runs-on: ubuntu-24.04
     steps:
       - name: fail if anything upstream failed
