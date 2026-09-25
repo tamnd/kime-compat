@@ -77,7 +77,7 @@ fn collect(dir: &Path, out: &mut Vec<PathBuf>) {
     for entry in entries.filter_map(Result::ok) {
         let path = entry.path();
         let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_string();
-        if name.starts_with('.') || name == "target" {
+        if name.starts_with('.') || name == "target" || name == "node_modules" {
             continue;
         }
         if path.is_dir() {

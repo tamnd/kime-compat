@@ -8,7 +8,9 @@ It is a separate repository for the same reason the benchmarks are: someone who 
 
 ## Where kime is, today
 
-There is no server yet, so nothing runs against one. What runs today is the response contract: the rules from `spec/03-api.md` that clients actually break on, checked against committed fixtures. Answer order matches question order, probability keys are exactly the offered labels, rounded probabilities sum to exactly one, `choice` is an argmax, `score` is the expected level, `legend` echoes the criteria, `model` is never an alias, and nothing is ever generated.
+Three things run. The response contract (the rules from `spec/03-api.md` that clients actually break on) is checked on the committed fixtures, and on what a running kime-serve answers to the same requests: answer order matches question order, probability keys are exactly the offered labels, rounded probabilities sum to exactly one, `choice` is an argmax, `score` is the expected level, `legend` echoes the criteria, `model` is never an alias, nothing is ever generated, and `/v1/models` has the shape the TypeSafe SDKs parse. The TypeSafe JS SDK examples in `sdk-js/` run against kime-serve with `@typesafe-ai/sdk` 0.6.0 unmodified, under Node 20 and Bun.
+
+CI builds kime-serve from tamnd/kime main on the laya checkpoint and runs both through `ci/against-kime.sh`, and the kime repository runs the same script on its own changes.
 
 ## The surfaces
 
@@ -28,7 +30,11 @@ The same list is in `surfaces.tsv`, which is what the harness reads.
 ```sh
 cargo run -- surfaces
 cargo run -- fixtures
+cargo run --release -- live http://127.0.0.1:8000 [texts.json]
+ci/against-kime.sh path/to/kime path/to/models node bun
 ```
+
+`live` sends each committed request to a running server as `jev-latest`, since a request with no model is laya-serve's dialect, and checks the answers with the same rules. With a JSON list of strings it also asks each fixture's questions about every text, which is how the contract gets checked on real inputs and not only the three written by hand.
 
 ## Laya's documented bugs
 
