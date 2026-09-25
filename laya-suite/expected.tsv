@@ -1,0 +1,50 @@
+# Each file of Laya 0.3.20's tests and what it does against kime, read by ci/laya-suite.sh. A fail
+# is one of three things: a Laya internal kime has no copy of (torch modules, private names), a
+# file the Laya sdist does not ship or a service it needs, or a Laya behaviour kime does not keep.
+file	status	reason
+test_audit_regressions.py	fail	imports laya.cli, Laya's command line, which kime does not copy
+test_batch.py	fail	uses the private Agent._to_internal and numpy tensors from the torch agent
+test_blank_lang_routing.py	pass	a blank lang falls through to detection
+test_calibration_persistence.py	fail	needs torch and Laya's DecisionModel, and fails on Laya too without its training files
+test_cli.py	fail	imports laya.cli, Laya's command line, which kime does not copy
+test_confidence.py	fail	imports answer_confidence and ece_score from laya.common, numpy helpers kime computes in Rust
+test_context_manager.py	pass
+test_criteria_normalization.py	fail	uses the private Agent._to_internal
+test_criteria.py	fail	needs torch and Laya's DecisionModel
+test_decision_model.py	fail	needs torch and Laya's DecisionModel
+test_doc_tables.py	fail	reads BENCHMARKS.md, which the sdist does not ship, and fails on Laya too
+test_docker_entrypoint.py	fail	reads docker/, which the sdist does not ship, and fails on Laya too
+test_docker_torch.py	fail	reads docker/, which the sdist does not ship, and fails on Laya too
+test_download.py	fail	needs torch and Laya's DecisionModel
+test_email.py	pass
+test_empty_questions.py	fail	needs torch and Laya's DecisionModel
+test_fast.py	skip	needs torch and CUDA
+test_head_checkpointing.py	fail	needs torch and Laya's DecisionModel
+test_hooks_api.py	fail	Laya's predict hooks, which kime does not have
+test_hooks.py	fail	Laya's predict hooks, which kime does not have
+test_lang_guess.py	pass
+test_langchain.py	fail	imports laya.integrations
+test_lazy_import.py	fail	imports laya.serve, the FastAPI server, where kime serves from Rust, and kime.Agent needs no torch at all so it does not stay lazy
+test_load_errors.py	fail	needs torch and Laya's DecisionModel
+test_local_e2e.py	fail	needs the laya-multilingual checkpoint on disk, and fails on Laya too without it
+test_mcp_local_e2e.py	fail	needs the mcp package and Laya's MCP server, and fails on Laya too without it
+test_mcp.py	skip	needs the mcp package
+test_onnx.py	skip	needs onnxruntime and Laya's export script
+test_packaging.py	fail	reads pyproject.toml and CI files the sdist does not ship, and fails on Laya too
+test_portability.py	fail	needs torch
+test_predict_batch.py	fail	needs torch and Laya's DecisionModel
+test_router_batch.py	pass
+test_router_memory.py	pass
+test_router.py	pass
+test_runtime_fixes.py	fail	needs torch and Laya's DecisionModel
+test_serve.py	skip	needs fastapi, and with it tests laya.serve, the FastAPI server, where kime serves from Rust
+test_server_example.py	skip	needs fastapi and httpx
+test_shortlist_cosine.py	fail	tests the private _cosine on numpy arrays, and kime's shortlist needs no numpy
+test_shortlist.py	fail	needs torch and Laya's DecisionModel
+test_structured_api.py	pass
+test_structured.py	pass
+test_system_one_lang.py	fail	builds an Agent subclass without calling its constructor, and kime's Agent keeps its state in the engine
+test_temperature_loading.py	fail	needs torch and Laya's DecisionModel
+test_tokenizer_cache.py	fail	tests the private _fix_tokenizer_config of the Hugging Face tokenizer
+test_training.py	fail	needs torch
+test_truncation_direction.py	fail	needs torch and Laya's DecisionModel

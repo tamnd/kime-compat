@@ -122,6 +122,16 @@ jobs:
       # examples are promised on.
       - name: the live surfaces
         run: ci/against-kime.sh kime/target/release/kime "$GITHUB_WORKSPACE/models" node bun
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      # Laya's own tests, against the kime package built from the same checkout.
+      - name: Laya's tests
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet pytest numpy ./kime/python
+          ci/laya-suite.sh "$RUNNER_TEMP/venv/bin/python" "$GITHUB_WORKSPACE/models"
 
   workflows:
     name: workflow audit
