@@ -120,11 +120,18 @@ jobs:
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       # Node 20 is the oldest the TypeSafe JS SDK supports, and Bun is the other runtime its
       # examples are promised on.
-      - name: the live surfaces
-        run: ci/against-kime.sh kime/target/release/kime "$GITHUB_WORKSPACE/models" node bun
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
+      - name: the TypeSafe Python SDK
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/sdk"
+          "$RUNNER_TEMP/sdk/bin/pip" install --quiet typesafe-sdk==0.7.1
+      - name: the live surfaces
+        env:
+          KIME_COMPAT_SDK_PYTHON: ${{ runner.temp }}/sdk/bin/python
+        run: ci/against-kime.sh kime/target/release/kime "$GITHUB_WORKSPACE/models" node bun
       # Laya's own tests, against the kime package built from the same checkout.
       - name: Laya's tests
         run: |
