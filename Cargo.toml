@@ -10,6 +10,9 @@ repository = "https://github.com/tamnd/kime-compat"
 description = "The compatibility harness for kime."
 publish = false
 
+# Its own workspace, so it builds when checked out inside another one, as tamnd/kime's CI does.
+[workspace]
+
 [dependencies]
 # preserve_order because answer order is part of the contract: spec/03-api.md says answers come
 # back in request order, and a map that sorts its keys would hide a server that does not.
