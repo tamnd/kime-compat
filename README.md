@@ -20,7 +20,7 @@ CI builds kime-serve from tamnd/kime main on the laya checkpoint and runs both t
 | TypeSafe Python SDK | The SDK's recorded fixtures replay against kime-serve and its typed parsing succeeds | M1 |
 | TypeSafe JS SDK | The examples run against kime-serve under Node 20 and Bun | M1 |
 | jev-ultrafast | `validate_choice` passes on 10,000 generated agent steps, and the Wikipedia example runs end to end with `jev-latest` unchanged | M1 |
-| Laya Python API | Laya's own test suite passes against the kime package, except the documented bugs in `laya_expected_diffs.md` | M1 |
+| Laya Python API | Laya's own test suite passes against the kime package, except the files listed in `laya-suite/expected.tsv` | M1 |
 | laya-serve clients | The curl examples give the same response shape, and the same answers within parity tolerance on the compat models | M1 |
 | Error bodies | A snapshot for every error status in `spec/03-api.md` | M1 |
 | The response contract | Every committed fixture obeys the rules clients depend on | M0 |
@@ -36,9 +36,15 @@ ci/against-kime.sh path/to/kime path/to/models node bun
 
 `live` sends each committed request to a running server as `jev-latest`, since a request with no model is laya-serve's dialect, and checks the answers with the same rules. With a JSON list of strings it also asks each fixture's questions about every text, which is how the contract gets checked on real inputs and not only the three written by hand.
 
-## Laya's documented bugs
+## Laya's own tests
 
-A few of Laya's behaviours are bugs that kime fixes on purpose, like a score level that can never win. Laya's tests that assert those behaviours are listed in `laya_expected_diffs.md` with the reason and the Laya issue, and they are the only tests allowed to fail. The file arrives with the Laya surface at M1.
+`ci/laya-suite.sh` downloads the Laya 0.3.20 sdist, checks its hash, and runs each of its 46 test files against the kime package, as a script and under pytest when it has test functions. The `laya` package in `laya-suite/shim` stands in for Laya: it maps Laya's public modules (the package, `agent`, `router`, `lang`, `shortlist`, `structured`, `email`, `presets` and `onnx_agent`) onto kime, so the test files run unchanged. The run routes on Laya's word lists alone, so Laya's routing tests apply as written.
+
+`laya-suite/expected.tsv` says what each file does against kime and why, and the script fails when a file does anything else, a pass included. Today 9 files pass (the router, routing batches, language guessing, structured decisions, email, blank lang routing and the context manager), 5 skip for an extra that is not installed, and 32 fail. The failures import torch and Laya's `DecisionModel`, Laya's private helpers, its hooks, CLI, MCP or FastAPI server, or read files the sdist does not ship, and 7 of them fail on Laya itself for that reason. Laya passes 35 of the 46 through the same script with `LAYA_SUITE_SHIM=0`.
+
+```sh
+ci/laya-suite.sh path/to/python-with-kime path/to/models
+```
 
 ## Contributing
 
