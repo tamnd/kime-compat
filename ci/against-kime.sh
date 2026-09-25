@@ -17,7 +17,7 @@ port="${KIME_COMPAT_PORT:-18800}"
 url="http://127.0.0.1:$port"
 log="$(mktemp)"
 
-KIME_MODELS="$models" "$bin" serve --port "$port" --models laya --device cpu --precision f32 > "$log" 2>&1 &
+"$bin" serve --port "$port" --models "$models/laya" --device cpu --precision f32 > "$log" 2>&1 &
 server=$!
 trap 'kill "$server" 2> /dev/null || true' EXIT
 fail() {
