@@ -1,0 +1,8 @@
+# The usage.input_tokens each engine reported for a fixture request: the case, Laya 0.3.20 on its own
+# checkpoint, and Jev where TypeSafe published the count. live fails a server whose count differs from
+# Laya's. single-option is not here because Laya refuses a question with no instructions.
+#
+# case	laya	jev
+systemone/jev-quickstart	205	392
+systemone/readme-ticket	150	
+systemone/spec-example	134	

@@ -6,6 +6,7 @@
 //! of HTTP/1.1 on a `TcpStream`, since the harness should not need a TLS stack or an async
 //! runtime to talk to a server on localhost.
 
+use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::time::{Duration, Instant};
@@ -106,8 +107,9 @@ pub struct Report {
     pub took_ms: Vec<f64>,
 }
 
-/// Checks `/v1/models` and every `(name, request)` against the server.
-pub fn run(server: &Server, cases: &[(String, Value)]) -> Report {
+/// Checks `/v1/models` and every `(name, request)` against the server. A case named in `tokens`
+/// must also report that many `usage.input_tokens`.
+pub fn run(server: &Server, cases: &[(String, Value)], tokens: &HashMap<String, u64>) -> Report {
     let mut report = Report::default();
     match server.call("GET", "/v1/models", None) {
         Ok((200, body)) => report.problems.extend(check_models(&body)),
@@ -123,11 +125,21 @@ pub fn run(server: &Server, cases: &[(String, Value)]) -> Report {
         report.took_ms.push(started.elapsed().as_secs_f64() * 1e3);
         report.calls += 1;
         match result {
-            Ok((200, response)) => report.problems.extend(
-                crate::contract::check(request, &response)
-                    .into_iter()
-                    .map(|p| format!("{name}: {p}")),
-            ),
+            Ok((200, response)) => {
+                report.problems.extend(
+                    crate::contract::check(request, &response)
+                        .into_iter()
+                        .map(|p| format!("{name}: {p}")),
+                );
+                let counted = response.pointer("/usage/input_tokens").and_then(Value::as_u64);
+                if let Some(&want) = tokens.get(name)
+                    && counted != Some(want)
+                {
+                    report.problems.push(format!(
+                        "{name}: usage.input_tokens is {counted:?}, Laya counts {want}"
+                    ));
+                }
+            }
             Ok((status, body)) => report.problems.push(format!("{name}: {status} {body}")),
             Err(e) => report.problems.push(format!("{name}: {e}")),
         }
