@@ -94,6 +94,23 @@ fn read_json(path: &Path) -> Result<serde_json::Value, String> {
     serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))
 }
 
+/// The `usage.input_tokens` Laya reports for each fixture, from `fixtures/usage.tsv`, keyed by the
+/// case as `live` names it.
+fn usage(path: &Path) -> Result<std::collections::HashMap<String, u64>, String> {
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut out = std::collections::HashMap::new();
+    for (i, line) in text.lines().enumerate().filter(|(_, l)| !l.starts_with('#') && !l.is_empty())
+    {
+        let mut cols = line.split('\t');
+        let (Some(case), Some(laya)) = (cols.next(), cols.next()) else {
+            return Err(format!("{}:{}: expected case and laya columns", path.display(), i + 1));
+        };
+        let laya = laya.parse().map_err(|e| format!("{}:{}: {e}", path.display(), i + 1))?;
+        out.insert(case.to_string(), laya);
+    }
+    Ok(out)
+}
+
 fn live(root: &Path, url: Option<String>, texts: Option<String>) -> Result<String, String> {
     let server = kime_compat::live::Server::new(
         &url.ok_or("live needs a base url, such as http://127.0.0.1:8000")?,
@@ -130,7 +147,8 @@ fn live(root: &Path, url: Option<String>, texts: Option<String>) -> Result<Strin
             }
         }
     }
-    let report = kime_compat::live::run(&server, &cases);
+    let tokens = usage(&root.join("usage.tsv"))?;
+    let report = kime_compat::live::run(&server, &cases, &tokens);
     let mut ms = report.took_ms.clone();
     ms.sort_by(f64::total_cmp);
     let at = |q: f64| {

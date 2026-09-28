@@ -1,0 +1,9 @@
+{
+  "model": "laya",
+  "answers": {
+    "department": {"type": "choice", "choice": "billing", "confidence": 0.22, "probabilities": {"billing": 0.48, "technical": 0.29, "sales": 0.23}},
+    "frustration": {"type": "score", "score": 0.99, "confidence": 0.75, "legend": {"0": "Calm, just stating facts", "1": "Frustrated but civil", "2": "Very angry, strong language"}, "probabilities": {"0": 0.09, "1": 0.83, "2": 0.08}},
+    "is_urgent": {"type": "noul", "noul": 0.76}
+  },
+  "usage": {"input_tokens": 205, "output_tokens": 0}
+}

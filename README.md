@@ -34,7 +34,7 @@ cargo run --release -- live http://127.0.0.1:8000 [texts.json]
 ci/against-kime.sh path/to/kime path/to/models node bun
 ```
 
-`live` sends each committed request to a running server as `jev-latest`, since a request with no model is laya-serve's dialect, and checks the answers with the same rules. With a JSON list of strings it also asks each fixture's questions about every text, which is how the contract gets checked on real inputs and not only the three written by hand.
+`live` sends each committed request to a running server as `jev-latest`, since a request with no model is laya-serve's dialect, and checks the answers with the same rules, and that `usage.input_tokens` is what Laya counts for the fixtures in `fixtures/usage.tsv`. With a JSON list of strings it also asks each fixture's questions about every text, which is how the contract gets checked on real inputs and not only the three written by hand.
 
 ## Laya's own tests
 
